@@ -2,7 +2,7 @@
 
 ## Status
 
-**Status:** Planned foundation. No application services have been implemented or deployed yet.
+**Status:** FastAPI backend foundation implemented. Domain services and deployment remain planned.
 
 ## System overview
 
@@ -37,7 +37,7 @@ The planned UI will use Tailwind CSS v4, shadcn/ui, Radix UI Primitives, Framer 
 
 ## Backend
 
-The backend will use Python and FastAPI.
+The backend uses Python 3.14 and FastAPI. The current implementation contains configuration, a health route, structured validation errors, request logging, and database integration scaffolding. Domain routes remain deferred.
 
 The intended request flow is:
 
@@ -102,7 +102,7 @@ Public HTTPS
               +--> PostgreSQL
 ```
 
-The final hosting provider will be selected later after verifying current free-tier rules, persistence, sleep behavior, quotas, HTTPS, logs, secrets, and billing risk. Azure is optional; Azure for Students verification is not currently confirmed, and no Azure resources will be provisioned during Milestone 0.
+The final hosting provider will be selected later after verifying current free-tier rules, persistence, sleep behavior, quotas, HTTPS, logs, secrets, and billing risk. Azure is optional; Azure for Students verification is not currently confirmed, and no Azure resources will be provisioned during Milestone 1.
 
 ## Why a modular monolith
 

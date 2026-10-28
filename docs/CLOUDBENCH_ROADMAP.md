@@ -173,6 +173,8 @@ cloudbench/
 
 ## 5. Backend architecture
 
+Milestone 1 implemented the initial Python 3.14/FastAPI foundation, environment-driven configuration, process health endpoint, logging baseline, SQLAlchemy session foundation, Alembic scaffolding, and an isolated API test. Domain models and migrations remain intentionally deferred.
+
 Use FastAPI with a clear request flow:
 
 ```text
