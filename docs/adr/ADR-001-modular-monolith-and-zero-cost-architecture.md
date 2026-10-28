@@ -2,11 +2,11 @@
 
 - **Status:** Accepted for Milestone 0
 - **Date:** 2026-10-28
-- **Decision owners:** CloudBench project owner and implementation agent
+- **Decision owners:** CloudXzen project owner and implementation agent
 
 ## Context
 
-CloudBench is a student portfolio project with a small Service Reliability Journal domain. Its portfolio value comes primarily from engineering discipline: architecture, testing, CI/CD, Docker, deployment, observability, security, documentation, and Git workflow.
+CloudXzen is a student portfolio project with a small Service Reliability Journal domain. Its portfolio value comes primarily from engineering discipline: architecture, testing, CI/CD, Docker, deployment, observability, security, documentation, and Git workflow.
 
 The project has a hard target cost of KSh 0. Azure for Students verification is not currently confirmed. The application therefore must not depend on Azure or any other paid provider, and it must remain portable between legitimate free-tier deployment options.
 
@@ -14,7 +14,7 @@ The domain does not currently require independent services, asynchronous process
 
 ## Decision
 
-CloudBench will start as a modular monolith with:
+CloudXzen will start as a modular monolith with:
 
 - a Next.js 15 frontend;
 - a Python/FastAPI backend;

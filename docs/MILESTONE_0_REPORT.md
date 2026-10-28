@@ -1,5 +1,7 @@
 # Milestone 0 Report
 
+> **Historical report:** This report was created before the project was renamed from CloudBench to CloudXzen. References to CloudBench describe the former project identity at the time of Milestone 0.
+
 ## MILESTONE 0 COMPLETE
 
 ### Product
@@ -29,9 +31,9 @@ The planned MVP is a deliberately small journal for registering services, record
 - `README.md`
 - `docs/ARCHITECTURE.md`
 - `docs/COST_AND_FREE_TIER.md`
-- `docs/CLOUDBENCH_ROADMAP.md`
-- `docs/CloudBench_Master_Project_Specification.md`
-- `docs/CloudBench.pdf`
+- `docs/CLOUDXZEN_ROADMAP.md`
+- `docs/CloudXzen_Master_Project_Specification.md`
+- `docs/CloudXzen.pdf`
 - `docs/adr/ADR-001-modular-monolith-and-zero-cost-architecture.md`
 - `docs/MILESTONE_0_REPORT.md`
 

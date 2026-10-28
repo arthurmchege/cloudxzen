@@ -1,4 +1,4 @@
-# CloudBench API
+# CloudXzen API
 
 ## Status
 
@@ -17,7 +17,7 @@ From `apps/api`:
 python3.14 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e ".[test]"
+python -m pip install -e ".[test,dev]"
 ```
 
 The repository root `.env.example` documents the currently supported environment variables. Copy it to `.env` only for local use; `.env` is ignored by Git.
@@ -73,8 +73,14 @@ From `apps/api`, with the virtual environment active:
 pytest
 ```
 
-The health test uses FastAPI's in-process `TestClient`; it does not require PostgreSQL, cloud services, or internet access.
+The health test uses an in-process `httpx.AsyncClient` with `httpx.ASGITransport`; it does not require PostgreSQL, cloud services, or internet access.
+
+To run the configured linter:
+
+```bash
+ruff check app tests
+```
 
 ## Database foundation
 
-SQLAlchemy session and declarative-base modules are prepared for future domain work. Alembic is initialized without a migration because no CloudBench domain tables exist yet. Domain models and migrations belong to the next database milestone.
+SQLAlchemy session and declarative-base modules are prepared for future domain work. Alembic is initialized without a migration because no CloudXzen domain tables exist yet. Domain models and migrations belong to the next database milestone.

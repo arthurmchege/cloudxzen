@@ -1,4 +1,4 @@
-# CloudBench Architecture
+# CloudXzen Architecture
 
 ## Status
 
@@ -6,7 +6,7 @@
 
 ## System overview
 
-CloudBench is planned as a small, provider-portable full-stack application for recording service checks and incidents.
+CloudXzen is planned as a small, provider-portable full-stack application for recording service checks and incidents.
 
 ```mermaid
 flowchart TD
@@ -106,7 +106,7 @@ The final hosting provider will be selected later after verifying current free-t
 
 ## Why a modular monolith
 
-CloudBench starts as a modular monolith because it provides clear internal boundaries without the operational cost of multiple services.
+CloudXzen starts as a modular monolith because it provides clear internal boundaries without the operational cost of multiple services.
 
 This approach gives the project:
 

@@ -1,10 +1,10 @@
-# CloudBench — Master Project Specification
+# CloudXzen — Master Project Specification
 
 ## 1. Project Identity
 
-**CloudBench — Production-Grade Cloud-Native Software Platform**
+**CloudXzen — Production-Grade Cloud-Native Software Platform**
 
-CloudBench is an engineering-focused portfolio project. The product itself should remain modest; the primary portfolio value comes from demonstrating how a real software system is designed, implemented, tested, deployed, monitored, secured, documented, and maintained.
+CloudXzen is an engineering-focused portfolio project. The product itself should remain modest; the primary portfolio value comes from demonstrating how a real software system is designed, implemented, tested, deployed, monitored, secured, documented, and maintained.
 
 The project should demonstrate:
 
@@ -166,7 +166,7 @@ The portfolio value should primarily come from:
 - Documentation
 - Git discipline
 
-Do not turn CloudBench into a huge SaaS platform.
+Do not turn CloudXzen into a huge SaaS platform.
 
 ---
 
@@ -764,7 +764,7 @@ Possible structure:
 
 ```text
 docs/
-├── CLOUDBENCH_MASTER_SPEC.md
+├── CLOUDXZEN_MASTER_SPEC.md
 ├── ARCHITECTURE.md
 ├── API.md
 ├── DATABASE.md
@@ -787,7 +787,7 @@ The structure may evolve.
 A reasonable starting direction:
 
 ```text
-cloudbench/
+cloudxzen/
 ├── .github/
 │   └── workflows/
 │
@@ -804,7 +804,7 @@ cloudbench/
 │       └── ...
 │
 ├── docs/
-│   ├── CLOUDBENCH_MASTER_SPEC.md
+│   ├── CLOUDXZEN_MASTER_SPEC.md
 │   ├── ARCHITECTURE.md
 │   ├── API.md
 │   ├── DATABASE.md
@@ -822,7 +822,7 @@ cloudbench/
 │
 ├── docker/
 │
-├── CloudBench.pdf
+├── CloudXzen.pdf
 ├── README.md
 ├── .gitignore
 └── ...
@@ -991,7 +991,7 @@ Be prepared to explain:
 
 # 34. Scaling Philosophy
 
-CloudBench is not primarily a "millions of requests per second" project.
+CloudXzen is not primarily a "millions of requests per second" project.
 
 The primary scalability concept is **operational scalability**:
 
@@ -1006,7 +1006,7 @@ A system can fail organizationally before it fails technically through:
 - Fear of changing production
 - Poor documentation
 
-CloudBench should demonstrate systematic solutions to these problems.
+CloudXzen should demonstrate systematic solutions to these problems.
 
 ---
 
@@ -1487,7 +1487,7 @@ These phases are guidelines. Do not delay meaningful Git checkpoints until an en
 
 # 50. MVP Definition
 
-The CloudBench MVP is:
+The CloudXzen MVP is:
 
 > A publicly deployed, working full-stack application with a Next.js 15 frontend using React 19, TypeScript, Tailwind CSS v4, shadcn/ui/Radix UI, Framer Motion, and Sonner; a Python/FastAPI backend; PostgreSQL persistence; meaningful automated tests; Docker support; a green GitHub Actions CI pipeline; Infrastructure-as-Code; Azure deployment; API documentation; and basic error monitoring.
 

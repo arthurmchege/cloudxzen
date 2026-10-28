@@ -1,6 +1,6 @@
-# CloudBench
+# CloudXzen
 
-CloudBench is a small **Service Reliability Journal**: a full-stack application for recording service checks and incidents, reviewing recent service history, and resolving incidents.
+CloudXzen is a small **Service Reliability Journal**: a full-stack application for recording service checks and incidents, reviewing recent service history, and resolving incidents.
 
 The product is intentionally modest. The primary goal is to demonstrate how to design, test, document, containerize, deploy, secure, and operate a real software system without buying unnecessary complexity.
 
@@ -82,17 +82,18 @@ Environment variables are documented in [.env.example](./.env.example). Never co
 
 ## Documentation
 
-- [Project roadmap](./docs/CLOUDBENCH_ROADMAP.md)
-- [Master specification](./docs/CloudBench_Master_Project_Specification.md)
+- [Project roadmap](./docs/CLOUDXZEN_ROADMAP.md)
+- [Master specification](./docs/CloudXzen_Master_Project_Specification.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Cost and free-tier policy](./docs/COST_AND_FREE_TIER.md)
 - [Milestone 0 report](./docs/MILESTONE_0_REPORT.md)
 - [Milestone 1 report](./docs/MILESTONE_1_REPORT.md)
+- [Pre-Milestone 2 remediation report](./docs/PRE_MILESTONE_2_REMEDIATION_REPORT.md)
 - [Backend README](./apps/api/README.md)
 - [Architecture decisions](./docs/adr/)
 
 ## Cost policy
 
-The target software/service cost is **KSh 0**. CloudBench will prioritize free/open-source software and free/student service tiers. Current pricing, quotas, restrictions, persistence, and billing risk must be verified against official provider documentation before deployment.
+The target software/service cost is **KSh 0**. CloudXzen will prioritize free/open-source software and free/student service tiers. Current pricing, quotas, restrictions, persistence, and billing risk must be verified against official provider documentation before deployment.
 
 No paid service has been activated and no cloud infrastructure has been provisioned.

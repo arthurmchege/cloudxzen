@@ -10,7 +10,7 @@
 Target cost: KSh 0
 ```
 
-The zero-cost target is a hard project constraint. CloudBench must remain useful and developable without purchasing software, domains, cloud credits, monitoring plans, or hosted databases.
+The zero-cost target is a hard project constraint. CloudXzen must remain useful and developable without purchasing software, domains, cloud credits, monitoring plans, or hosted databases.
 
 ## Software
 

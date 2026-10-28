@@ -1,5 +1,7 @@
 # Milestone 1 Report
 
+> **Historical report:** This report was created before the project was renamed from CloudBench to CloudXzen. References to CloudBench describe the former project identity at the time of Milestone 1.
+
 ## MILESTONE 1 COMPLETE
 
 ### Product
@@ -55,7 +57,7 @@ The dependency ranges are defined in `apps/api/pyproject.toml`. No cloud SDK, mo
 - `apps/api/app/db/`
 - `apps/api/tests/test_health.py`
 - `docs/ARCHITECTURE.md`
-- `docs/CLOUDBENCH_ROADMAP.md`
+- `docs/CLOUDXZEN_ROADMAP.md`
 - `docs/MILESTONE_1_REPORT.md`
 
 ### API

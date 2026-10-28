@@ -3,9 +3,9 @@ requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cloudbench-api"
+name = "cloudxzen-api"
 version = "0.1.0"
-description = "FastAPI backend for CloudBench"
+description = "FastAPI backend for CloudXzen"
 requires-python = ">=3.14,<3.15"
 dependencies = [
     "alembic>=1.15,<2.0",
@@ -20,6 +20,9 @@ dependencies = [
 test = [
     "httpx>=0.28,<1.0",
     "pytest>=8.3,<9.0",
+]
+dev = [
+    "ruff>=0.9,<1.0",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,1 +1,1 @@
-"""CloudBench FastAPI application package."""
+"""CloudXzen FastAPI application package."""

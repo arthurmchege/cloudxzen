@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     environment: Environment = Field(default="development")
     database_url: str = Field(
-        default="postgresql+psycopg://cloudbench:cloudbench@localhost:5432/cloudbench"
+        default="postgresql+psycopg://cloudxzen:cloudxzen@localhost:5432/cloudxzen"
     )
 
     @property

@@ -1,19 +1,19 @@
-# CloudBench Implementation Roadmap
+# CloudXzen Implementation Roadmap
 
 ## Current repository assessment
 
 The repository is still in the initial planning stage:
 
 - The only tracked file is `README.md`.
-- The specification exists in `docs/CloudBench_Master_Project_Specification.md` and `docs/CloudBench.pdf`.
+- The specification exists in `docs/CloudXzen_Master_Project_Specification.md` and `docs/CloudXzen.pdf`.
 - There is no application code, package manifest, database schema, Docker configuration, CI workflow, IaC, or tests yet.
 - The repository has not yet started real product implementation.
 
 ## 1. Recommended product/domain
 
-### Product: CloudBench Service Reliability Journal
+### Product: CloudXzen Service Reliability Journal
 
-CloudBench should be a small operational journal for recording service checks and incidents.
+CloudXzen should be a small operational journal for recording service checks and incidents.
 
 A user can:
 
@@ -69,7 +69,7 @@ This domain is a better fit than a generic task manager or large SaaS platform b
 - creates useful API endpoints without endpoint inflation
 - naturally suits a small dashboard and event history UI
 - gives real backend business logic instead of simple CRUD only
-- aligns with CloudBench’s operational and engineering theme
+- aligns with CloudXzen’s operational and engineering theme
 
 ## 3. Proposed system architecture
 
@@ -115,7 +115,7 @@ Provider-agnostic deployment
 ## 4. Proposed repository structure
 
 ```text
-cloudbench/
+cloudxzen/
 ├── apps/
 │   ├── web/
 │   │   ├── app/
@@ -138,7 +138,7 @@ cloudbench/
 │       └── ...
 │
 ├── docs/
-│   ├── CloudBench_Master_Project_Specification.md
+│   ├── CloudXzen_Master_Project_Specification.md
 │   ├── ARCHITECTURE.md
 │   ├── API.md
 │   ├── DATABASE.md
@@ -168,7 +168,7 @@ cloudbench/
 ├── .env.example
 ├── .gitignore
 ├── README.md
-└── docs/CloudBench.pdf
+└── docs/CloudXzen.pdf
 ```
 
 ## 5. Backend architecture
@@ -563,7 +563,7 @@ Achievements:
 Git checkpoint:
 
 ```text
-docs: define CloudBench product and engineering roadmap
+docs: define CloudXzen product and engineering roadmap
 ```
 
 ### Milestone 1 — Backend foundation
@@ -686,7 +686,7 @@ Achievements:
 Git checkpoint:
 
 ```text
-test: establish CloudBench quality suite
+test: establish CloudXzen quality suite
 ```
 
 ### Milestone 8 — Docker and local reproducibility
@@ -702,7 +702,7 @@ Achievements:
 Git checkpoint:
 
 ```text
-build: containerize CloudBench applications
+build: containerize CloudXzen applications
 ```
 
 ### Milestone 9 — GitHub Actions CI
@@ -737,8 +737,8 @@ Achievements:
 Git checkpoints:
 
 ```text
-infra: provision selected CloudBench environment
-feat: deploy CloudBench to selected provider
+infra: provision selected CloudXzen environment
+feat: deploy CloudXzen to selected provider
 ```
 
 ### Milestone 11 — Observability and production readiness
@@ -773,7 +773,7 @@ Achievements:
 Git checkpoint:
 
 ```text
-docs: complete CloudBench engineering documentation
+docs: complete CloudXzen engineering documentation
 ```
 
 ## 18. Smaller achievements inside each milestone

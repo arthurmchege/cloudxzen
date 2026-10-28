@@ -1,8 +1,8 @@
 import logging
 import time
-from uuid import uuid4
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -25,8 +25,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="CloudBench API",
-    description="Backend API for the CloudBench Service Reliability Journal.",
+    title="CloudXzen API",
+    description="Backend API for the CloudXzen Service Reliability Journal.",
     version="0.1.0",
     lifespan=lifespan,
 )
