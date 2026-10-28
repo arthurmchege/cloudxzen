@@ -2,7 +2,9 @@
 
 ## Status
 
-**Status:** Approved dual-environment strategy documented. Domain models, migrations, Compose configuration, and database integration tests are not implemented yet.
+**Status:** Implemented for Milestone 2. Domain models, the initial
+migration, the Compose database service, and guarded PostgreSQL integration
+tests are available. Actual database execution remains environment-dependent.
 
 CloudXzen will support both:
 
@@ -28,7 +30,8 @@ The current development machine was inspected without changing services or start
 
 The native PostgreSQL service is managed through systemd. The top-level `postgresql.service` reports active while the version-specific cluster state is shown by `pg_lsclusters`.
 
-No PostgreSQL database, role, Docker container, image, volume, or system service was modified during this documentation task.
+No native PostgreSQL database or role was modified. The Compose file is
+available as `compose.yaml`, but no container or volume was started or created.
 
 ## Port arrangement
 
@@ -113,7 +116,7 @@ The committed `.env.example` contains no password. The actual local password mus
 
 Docker and the Compose plugin are installed on the current machine, but no container or Compose project was started during this task.
 
-The future Compose configuration should use:
+The Compose configuration uses:
 
 - an official PostgreSQL 18 image;
 - a service named `db`;
@@ -136,11 +139,7 @@ If the API later runs inside the same Compose project, `localhost` must not be u
 postgresql+psycopg://cloudxzen:YOUR_LOCAL_PASSWORD@db:5432/cloudxzen
 ```
 
-The actual Compose file, named volume, health check, and database initialization belong to the approved database milestone. They are intentionally not created yet.
-
-### Future Docker workflow
-
-Once Compose is implemented and approved:
+### Docker workflow
 
 ```bash
 docker compose up -d db
@@ -211,14 +210,15 @@ The database schema and migration history must remain identical in all three cas
 
 ## Migrations and tests
 
-The future workflow should apply the same Alembic migrations to either environment:
+The same Alembic migration applies to either environment:
 
 ```bash
 cd apps/api
-alembic upgrade head
+uv run alembic upgrade head
 ```
 
-Integration tests must use a dedicated test database, not the ordinary development database. A future configuration should provide a separate `TEST_DATABASE_URL`, for example:
+Integration tests use a dedicated test database, not the ordinary development
+database. Configure `TEST_DATABASE_URL` explicitly, for example:
 
 ```text
 postgresql+psycopg://cloudxzen_test:YOUR_TEST_PASSWORD@localhost:5432/cloudxzen_test
@@ -226,7 +226,20 @@ postgresql+psycopg://cloudxzen_test:YOUR_TEST_PASSWORD@localhost:5432/cloudxzen_
 
 The test database must be created separately and must never contain ordinary development data. CI should use an isolated PostgreSQL 18 service. SQLite is not an acceptable replacement for tests that verify PostgreSQL-specific behavior.
 
-Unit tests that do not require PostgreSQL must remain runnable without a database server.
+From `apps/api`, run unit tests without PostgreSQL:
+
+```bash
+uv run pytest
+```
+
+Run PostgreSQL integration tests separately:
+
+```bash
+uv run pytest tests/integration
+```
+
+The integration suite refuses to run when `TEST_DATABASE_URL` is absent or
+matches `DATABASE_URL`.
 
 ## Backup and restore guidance
 

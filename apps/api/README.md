@@ -2,7 +2,8 @@
 
 ## Status
 
-The API foundation is implemented. Domain routes and database tables are intentionally deferred to later milestones.
+The API foundation and initial service database schema are implemented. Service
+HTTP routes remain intentionally deferred to a later milestone.
 
 ## Requirements
 
@@ -14,10 +15,8 @@ The API foundation is implemented. Domain routes and database tables are intenti
 From `apps/api`:
 
 ```bash
-python3.14 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e ".[test,dev]"
+uv venv
+uv sync --extra test --extra dev
 ```
 
 The repository root `.env.example` documents the currently supported environment variables. Copy it to `.env` only for local use; `.env` is ignored by Git.
@@ -27,7 +26,8 @@ The repository root `.env.example` documents the currently supported environment
 | Variable | Required | Purpose |
 |---|---:|---|
 | `ENVIRONMENT` | No | `development`, `test`, or `production`; defaults to `development`. |
-| `DATABASE_URL` | No | SQLAlchemy PostgreSQL URL used by the database foundation; defaults to a fake local development URL. |
+| `DATABASE_URL` | No | SQLAlchemy PostgreSQL URL for the selected development database. |
+| `TEST_DATABASE_URL` | No | Explicit PostgreSQL URL for destructive integration-test setup. Tests refuse to use `DATABASE_URL`. |
 
 The health endpoint does not connect to PostgreSQL yet. The default database URL is a local placeholder for the future database foundation, not a credential.
 
@@ -70,17 +70,35 @@ When running in development, FastAPI exposes:
 From `apps/api`, with the virtual environment active:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 The health test uses an in-process `httpx.AsyncClient` with `httpx.ASGITransport`; it does not require PostgreSQL, cloud services, or internet access.
 
+PostgreSQL integration tests are kept separate and require `TEST_DATABASE_URL`:
+
+```bash
+uv run pytest tests/integration
+```
+
+They refuse to run if `TEST_DATABASE_URL` is absent or matches `DATABASE_URL`.
+
 To run the configured linter:
 
 ```bash
-ruff check app tests
+uv run ruff check app tests
 ```
 
 ## Database foundation
 
-SQLAlchemy session and declarative-base modules are prepared for future domain work. Alembic is initialized without a migration because no CloudXzen domain tables exist yet. Domain models and migrations belong to the next database milestone.
+The initial `services` and `service_events` schema is represented by
+`app.domains.services.models` and migration
+`alembic/versions/20260301_0001_create_service_tables.py`. Both native
+PostgreSQL and Docker PostgreSQL use the same models and migration:
+
+```bash
+uv run alembic upgrade head
+```
+
+Use the native or Docker URLs documented in
+[`docs/POSTGRESQL_DEVELOPMENT.md`](../../docs/POSTGRESQL_DEVELOPMENT.md).

@@ -585,6 +585,9 @@ feat: bootstrap FastAPI service
 
 ### Milestone 2 — Database foundation
 
+**Status:** Implemented locally; live PostgreSQL execution is pending explicit
+database credentials or container-start authorization.
+
 Achievements:
 
 - PostgreSQL local setup

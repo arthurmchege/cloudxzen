@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     """Runtime configuration loaded from environment variables."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=("../../.env", ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     database_url: str = Field(
         default="postgresql+psycopg://cloudxzen:cloudxzen@localhost:5432/cloudxzen"
     )
+    test_database_url: str | None = Field(default=None)
 
     @property
     def is_production(self) -> bool:
