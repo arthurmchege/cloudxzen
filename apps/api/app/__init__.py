@@ -1,0 +1,1 @@
+"""CloudBench FastAPI application package."""
