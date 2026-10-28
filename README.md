@@ -87,6 +87,7 @@ Environment variables are documented in [.env.example](./.env.example). Never co
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Cost and free-tier policy](./docs/COST_AND_FREE_TIER.md)
 - [Milestone 0 report](./docs/MILESTONE_0_REPORT.md)
+- [Milestone 1 report](./docs/MILESTONE_1_REPORT.md)
 - [Backend README](./apps/api/README.md)
 - [Architecture decisions](./docs/adr/)
 
