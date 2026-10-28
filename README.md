@@ -89,6 +89,7 @@ Environment variables are documented in [.env.example](./.env.example). Never co
 - [Milestone 0 report](./docs/MILESTONE_0_REPORT.md)
 - [Milestone 1 report](./docs/MILESTONE_1_REPORT.md)
 - [Pre-Milestone 2 remediation report](./docs/PRE_MILESTONE_2_REMEDIATION_REPORT.md)
+- [PostgreSQL development strategy](./docs/POSTGRESQL_DEVELOPMENT.md)
 - [Backend README](./apps/api/README.md)
 - [Architecture decisions](./docs/adr/)
 

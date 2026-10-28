@@ -141,9 +141,22 @@ All options are free/open-source and compatible with the KSh 0 policy.
 
 This maximizes contributor flexibility but increases setup documentation and the number of environments to verify.
 
+### Current inspection result
+
+Both approved local paths are available:
+
+- native PostgreSQL 18.6 is installed and the PostgreSQL 18 `main` cluster is online on `127.0.0.1:5432`;
+- Docker Engine 29.9.1 is installed;
+- Docker Compose v5.6.0 is installed; and
+- `127.0.0.1:5433` was not listening at inspection time.
+
+The native service is managed through systemd. `pg_lsclusters` reports the version-specific cluster state. No Docker container was started and no system service was changed.
+
 ### Recommendation
 
-Use Docker PostgreSQL as the primary documented path if Docker is already available, while allowing host-installed PostgreSQL as an alternative. Before implementation, check whether Docker is installed rather than assuming it. The database test suite must remain PostgreSQL-based and must not silently substitute SQLite.
+Support both environments with native PostgreSQL 18 as the currently available primary path and Docker PostgreSQL 18 as the reproducible isolated alternative. Use native `5432` and Docker host port `5433` mapped to container port `5432`, with the Docker host port configurable. The database test suite must remain PostgreSQL-based and must not silently substitute SQLite.
+
+Detailed setup, switching, safety, and backup guidance is documented in [POSTGRESQL_DEVELOPMENT.md](./POSTGRESQL_DEVELOPMENT.md).
 
 No hosted database is required.
 
@@ -218,7 +231,16 @@ The following checks were executed after the changes:
 - validated Alembic configuration without connecting to PostgreSQL;
 - reviewed the final diff for secrets, generated files, and unrelated changes.
 
-No PostgreSQL server was provisioned or started, so database connectivity is not claimed.
+Additional environment inspection confirmed:
+
+- `psql` and `pg_isready` are installed;
+- native PostgreSQL 18.6 is accepting connections on port `5432`;
+- an unauthenticated `psql` query was not completed because the existing server requires a password;
+- Docker Engine and Compose are installed;
+- no Docker Compose project is running; and
+- port `5433` is not listening.
+
+No PostgreSQL database, role, Docker image, container, volume, or system service was created, started, stopped, or modified. Database application connectivity is not claimed.
 
 ## 9. Git status
 
