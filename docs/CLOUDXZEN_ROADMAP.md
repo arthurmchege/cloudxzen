@@ -644,6 +644,8 @@ feat: add incident resolution rules
 
 ### Milestone 5 — Backend API hardening and documentation
 
+**Status: Complete and verified.**
+
 Objectives:
 
 - standardize HTTP error envelopes and generated error responses;
@@ -659,15 +661,30 @@ cost target.
 
 Planned checkpoints:
 
-1. normalize route errors and validation responses;
-2. harden production configuration and documentation exposure;
-3. verify OpenAPI response contracts and database failure paths;
-4. run the complete backend verification suite and update API documentation.
+1. **Complete:** normalize route errors and validation responses;
+2. **Complete:** harden production configuration and documentation exposure;
+3. **Complete:** verify OpenAPI response contracts and database failure paths;
+4. **Complete:** run the complete backend verification suite and update API
+   documentation.
+
+Verified results:
+
+- structured validation, not-found, conflict, and database-error envelopes;
+- OpenAPI declarations for relevant success and failure responses;
+- production `/docs`, `/redoc`, and `/openapi.json` restrictions;
+- automated production configuration tests;
+- guarded Alembic `base` to `head` migration verification;
+- 54 backend tests passing, with Ruff, compilation, lock, and diff checks
+  passing.
+
+The complete handoff report is
+[`docs/MILESTONE_5_REPORT.md`](MILESTONE_5_REPORT.md). `/api/v1` routing and
+request-ID validation remain explicitly deferred compatibility decisions.
 
 Git checkpoint:
 
 ```text
-feat(api): harden error contracts and documentation
+test(api): verify production docs and migrations
 ```
 
 ### Milestone 6 — Frontend foundation
