@@ -62,9 +62,9 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
               className="rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-accent-strong"
-              href="#status"
+              href="/services"
             >
-              Explore the foundation
+              View services
             </Link>
             <span className="text-sm text-muted">Built for deliberate operations.</span>
           </div>
@@ -99,8 +99,8 @@ export default function Home() {
               </div>
             </div>
             <div className="rounded-2xl bg-[#f4f7f4] p-4 text-sm text-muted">
-              No live service data is connected yet. The product foundation is
-              ready for the next milestone.
+              Connect the API locally to record services, checks, and incidents
+              without losing the operational context.
             </div>
           </div>
         </div>
@@ -133,14 +133,14 @@ export default function Home() {
         <div className="rounded-3xl bg-accent-strong p-8 text-white sm:p-12">
           <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
             <div>
-              <p className="text-xs font-bold tracking-[0.2em] text-[#a8d7c6] uppercase">Foundation status</p>
+              <p className="text-xs font-bold tracking-[0.2em] text-[#a8d7c6] uppercase">Service journal</p>
               <h2 className="mt-4 max-w-2xl text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                The interface is taking shape. The data workflows come next.
+                Keep the operational story close at hand.
               </h2>
             </div>
             <p className="max-w-xs text-sm leading-6 text-[#c8e4d9]">
-              This first release is intentionally honest: it establishes the
-              shell without pretending that monitoring is already connected.
+              Browse registered services, record supported events, and resolve
+              incidents through the existing API.
             </p>
           </div>
         </div>

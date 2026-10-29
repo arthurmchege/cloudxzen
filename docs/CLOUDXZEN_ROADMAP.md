@@ -12,8 +12,8 @@ verified state is:
   TypeScript, Tailwind CSS, tests, and production build checks;
 - Milestones 0–6 are complete where their milestone sections below record
   verified evidence;
-- Milestone 7, Frontend/API integration, is the next planned milestone and
-  has not started;
+- Milestone 7, Frontend/API integration, is in progress after the approved
+  decision to consume the implemented root `/services` contract;
 - the current product API uses root `/services` routes while `/api/v1` remains
   an unresolved compatibility decision;
 - local development continues to target KSh 0 and the modular-monolith
@@ -738,6 +738,8 @@ feat(frontend): establish Next.js foundation
 
 ### Milestone 7 — Frontend/API integration
 
+**Status: In progress.**
+
 Achievements:
 
 - service list page
@@ -747,6 +749,14 @@ Achievements:
 - resolve action
 - loading/error/success handling
 - frontend tests
+
+Current implementation uses the verified root `/services` contract. The
+specification's `/api/v1` namespace remains a deferred compatibility decision.
+The backend has no dedicated `GET /services/{service_id}` route, so the
+frontend currently locates a service from the collection before loading its
+event history. The milestone report records the implementation and verified
+test results:
+[`docs/MILESTONE_7_REPORT.md`](MILESTONE_7_REPORT.md).
 
 Git checkpoints:
 

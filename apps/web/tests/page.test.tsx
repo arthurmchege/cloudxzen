@@ -10,7 +10,7 @@ describe("home page", () => {
     expect(
       screen.getByRole("heading", { name: /service reliability, without the noise/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/foundation is ready/i)).toBeInTheDocument();
+    expect(screen.getByText(/operational context/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /cloudxzen home/i })).toHaveAttribute(
       "href",
       "/"

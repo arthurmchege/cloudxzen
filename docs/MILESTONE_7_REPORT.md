@@ -190,16 +190,69 @@ mocks or a dedicated test configuration and will not contact production data.
 - Cross-origin development configuration may be needed once the client is
   implemented; no production origin or secret will be hard-coded.
 
-## Initial Status
+## Implementation Progress
 
-**In Progress — contract discovery and namespace decision pending.**
+The namespace decision was approved as **preserve `/services`**. The first
+integration slice is implemented in `apps/web`:
 
-No frontend/API integration functionality has been implemented in this
-milestone yet. Completion will require verified tests, quality checks, a
-roadmap update, and a final Git checkpoint.
+- `lib/api.ts` centralizes typed requests, response guards, structured API
+  errors, and network-failure handling;
+- `next.config.ts` provides a same-origin `/api-backend` proxy to the
+  server-only `API_BASE_URL`, avoiding a new backend CORS contract;
+- `/services` loads real services, supports retry and empty states, and
+  provides service registration with duplicate-submit protection;
+- `/services/[id]` loads the selected service by locating its UUID in the
+  existing service collection, loads event history, records events, and
+  resolves active incidents;
+- the home page now links to the live service workflow rather than presenting
+  the foundation as the primary experience;
+- API-client and service-list behavior tests cover success, validation,
+  network, malformed-response, loading, empty, retry, and client validation
+  behavior.
+
+The backend has no dedicated `GET /services/{service_id}` endpoint. The
+details page therefore uses `GET /services` and matches the UUID locally,
+then requests that service's events. This is correct for the current
+contract but is less efficient than a dedicated retrieval endpoint and should
+be reconsidered before the service list grows.
+
+## Testing and Verification Progress
+
+Frontend checks completed from `apps/web`:
+
+```text
+npm run typecheck: passed
+npm run lint: passed
+npm test -- --run: passed; 3 test files, 11 tests
+npm run build: passed; Next.js 15.5.28 production build
+```
+
+Backend regression checks completed from `apps/api`:
+
+```text
+uv run --locked pytest: passed; 23 passed, 31 skipped
+uv run --locked ruff check app tests: passed
+uv run --locked python -m compileall -q app tests: passed
+uv lock --check: passed
+```
+
+The 31 skipped tests require the separately configured PostgreSQL
+`TEST_DATABASE_URL`; this run did not claim PostgreSQL integration coverage.
+The previously verified backend checkpoint remains documented in the
+Milestone 5 and Milestone 6 reports.
+
+## Current Status
+
+**In Progress — the initial live integration is implemented and verified
+locally, but the milestone is not yet complete.**
+
+Remaining work includes broader user-visible tests for service details and
+event actions, a final review of API-client contracts, full verification with
+the safe PostgreSQL test configuration where available, roadmap reconciliation,
+and a final Git checkpoint.
 
 ## Next Action
 
-Confirm whether Milestone 7 should preserve and consume the implemented root
-`/services` contract (recommended), or whether the project should first adopt
-`/api/v1` through a separately scoped backend compatibility change.
+Continue with focused workflow tests and final quality verification without
+changing the approved `/services` namespace or inventing a dedicated service
+retrieval endpoint.
