@@ -6,10 +6,12 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.routes.health import router as health_router
+from app.api.routes.services import router as services_router
 from app.core.config import get_settings
-from app.core.errors import validation_exception_handler
+from app.core.errors import database_exception_handler, validation_exception_handler
 from app.core.logging import configure_logging
 
 logger = logging.getLogger(__name__)
@@ -32,6 +34,7 @@ app = FastAPI(
 )
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(SQLAlchemyError, database_exception_handler)
 
 
 @app.middleware("http")
@@ -65,3 +68,4 @@ async def request_logging_middleware(request: Request, call_next):
 
 
 app.include_router(health_router)
+app.include_router(services_router)
