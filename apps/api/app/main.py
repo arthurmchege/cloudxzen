@@ -5,16 +5,21 @@ from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import HTTPException, RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.routes.health import router as health_router
 from app.api.routes.services import router as services_router
 from app.core.config import get_settings
-from app.core.errors import database_exception_handler, validation_exception_handler
+from app.core.errors import (
+    database_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
+)
 from app.core.logging import configure_logging
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 @asynccontextmanager
@@ -30,9 +35,13 @@ app = FastAPI(
     title="CloudXzen API",
     description="Backend API for the CloudXzen Service Reliability Journal.",
     version="0.1.0",
+    docs_url=None if settings.is_production else "/docs",
+    redoc_url=None if settings.is_production else "/redoc",
+    openapi_url=None if settings.is_production else "/openapi.json",
     lifespan=lifespan,
 )
 
+app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(SQLAlchemyError, database_exception_handler)
 

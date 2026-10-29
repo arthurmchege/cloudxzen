@@ -301,7 +301,10 @@ def test_create_event_returns_not_found_for_missing_service(
     response = asyncio.run(request())
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Service not found"
+    assert response.json()["error"] == {
+        "code": "not_found",
+        "message": "Service not found",
+    }
 
 
 def test_list_service_events_returns_empty_array_for_new_service(
@@ -388,7 +391,8 @@ def test_list_service_events_returns_not_found_for_missing_service(
     response = asyncio.run(request())
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Service not found"
+    assert response.json()["error"]["code"] == "not_found"
+    assert response.json()["error"]["message"] == "Service not found"
 
 
 def test_resolve_incident_sets_server_generated_timestamp(
@@ -477,7 +481,8 @@ def test_resolve_event_returns_not_found_for_missing_service(
     response = asyncio.run(request())
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Service not found"
+    assert response.json()["error"]["code"] == "not_found"
+    assert response.json()["error"]["message"] == "Service not found"
 
 
 def test_resolve_event_returns_not_found_for_missing_event(
@@ -495,7 +500,8 @@ def test_resolve_event_returns_not_found_for_missing_event(
     response = asyncio.run(request())
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Event not found"
+    assert response.json()["error"]["code"] == "not_found"
+    assert response.json()["error"]["message"] == "Event not found"
 
 
 def test_resolve_event_is_scoped_to_service(api_client: httpx.AsyncClient) -> None:
@@ -527,7 +533,8 @@ def test_resolve_event_is_scoped_to_service(api_client: httpx.AsyncClient) -> No
     response = asyncio.run(request())
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Event not found"
+    assert response.json()["error"]["code"] == "not_found"
+    assert response.json()["error"]["message"] == "Event not found"
 
 
 def test_resolve_check_returns_conflict(api_client: httpx.AsyncClient) -> None:
@@ -554,7 +561,8 @@ def test_resolve_check_returns_conflict(api_client: httpx.AsyncClient) -> None:
     response = asyncio.run(request())
 
     assert response.status_code == 409
-    assert response.json()["detail"] == "Only incident events can be resolved"
+    assert response.json()["error"]["code"] == "conflict"
+    assert response.json()["error"]["message"] == "Only incident events can be resolved"
 
 
 def test_resolve_already_resolved_incident_returns_conflict(
@@ -588,7 +596,8 @@ def test_resolve_already_resolved_incident_returns_conflict(
 
     assert first_response.status_code == 200
     assert second_response.status_code == 409
-    assert second_response.json()["detail"] == "Incident is already resolved"
+    assert second_response.json()["error"]["code"] == "conflict"
+    assert second_response.json()["error"]["message"] == "Incident is already resolved"
 
 
 def test_resolve_database_error_returns_generic_error_and_rolls_back(

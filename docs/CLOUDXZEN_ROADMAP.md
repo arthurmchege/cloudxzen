@@ -642,7 +642,35 @@ feat: add service event workflow
 feat: add incident resolution rules
 ```
 
-### Milestone 5 — Frontend foundation
+### Milestone 5 — Backend API hardening and documentation
+
+Objectives:
+
+- standardize HTTP error envelopes and generated error responses;
+- make production documentation exposure an explicit configuration decision;
+- verify request correlation headers and meaningful database failure behavior;
+- document the current unversioned API contract and the deferred `/api/v1`
+  compatibility decision;
+- add focused failure-path and OpenAPI contract tests.
+
+This milestone does not add authentication, pagination, Redis, queues, cloud
+resources, or paid services. It preserves the modular monolith and the KSh 0
+cost target.
+
+Planned checkpoints:
+
+1. normalize route errors and validation responses;
+2. harden production configuration and documentation exposure;
+3. verify OpenAPI response contracts and database failure paths;
+4. run the complete backend verification suite and update API documentation.
+
+Git checkpoint:
+
+```text
+feat(api): harden error contracts and documentation
+```
+
+### Milestone 6 — Frontend foundation
 
 Achievements:
 
@@ -658,7 +686,7 @@ Git checkpoint:
 feat: bootstrap Next.js web application
 ```
 
-### Milestone 6 — Frontend/API integration
+### Milestone 7 — Frontend/API integration
 
 Achievements:
 
@@ -677,7 +705,7 @@ feat: integrate service dashboard with API
 feat: add service event interactions
 ```
 
-### Milestone 7 — Quality gates and meaningful tests
+### Milestone 8 — Quality gates and meaningful tests
 
 Achievements:
 
@@ -694,7 +722,7 @@ Git checkpoint:
 test: establish CloudXzen quality suite
 ```
 
-### Milestone 8 — Docker and local reproducibility
+### Milestone 9 — Docker and local reproducibility
 
 Achievements:
 
@@ -710,7 +738,7 @@ Git checkpoint:
 build: containerize CloudXzen applications
 ```
 
-### Milestone 9 — GitHub Actions CI
+### Milestone 10 — GitHub Actions CI
 
 Achievements:
 
@@ -727,7 +755,7 @@ Git checkpoint:
 ci: add automated quality pipeline
 ```
 
-### Milestone 10 — Provider-agnostic IaC and deployment
+### Milestone 11 — Provider-agnostic IaC and deployment
 
 Achievements:
 
@@ -746,7 +774,7 @@ infra: provision selected CloudXzen environment
 feat: deploy CloudXzen to selected provider
 ```
 
-### Milestone 11 — Observability and production readiness
+### Milestone 12 — Observability and production readiness
 
 Achievements:
 
@@ -763,7 +791,7 @@ Git checkpoint:
 feat: add production observability
 ```
 
-### Milestone 12 — Documentation and portfolio polish
+### Milestone 13 — Documentation and portfolio polish
 
 Achievements:
 

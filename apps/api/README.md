@@ -32,7 +32,11 @@ The repository root `.env.example` documents the currently supported environment
 The health endpoint does not connect to PostgreSQL. Service routes use the
 configured PostgreSQL database and require a working `DATABASE_URL`.
 
-Validation failures use a structured `validation_error` response. Requests receive an `X-Request-ID` response header, and request completion/failure is logged with method, path, status, duration, and the request ID.
+Validation failures use a structured `validation_error` response. Route
+failures use the same envelope with `not_found` or `conflict` error codes.
+Requests receive an `X-Request-ID` response header, and request
+completion/failure is logged with method, path, status, duration, and the
+request ID.
 
 ## Run locally
 
@@ -193,6 +197,10 @@ When running in development, FastAPI exposes:
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
+
+Interactive documentation and the OpenAPI endpoint are disabled when
+`ENVIRONMENT=production`. The generated schemas document the structured error
+responses used by the service routes.
 
 ## Tests
 

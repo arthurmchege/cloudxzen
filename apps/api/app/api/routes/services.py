@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.errors import ErrorResponse
 from app.db.session import get_db
 from app.domains.services.models import EventType
 from app.domains.services.repository import (
@@ -34,7 +35,12 @@ def _service_response(service) -> ServiceResponse:
     return response.model_copy(update={"status": derive_service_status(service.events)})
 
 
-@router.post("", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=ServiceResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={422: {"model": ErrorResponse}},
+)
 def create_service_endpoint(
     payload: ServiceCreate,
     db: Session = Depends(get_db),
@@ -51,7 +57,7 @@ def create_service_endpoint(
     return _service_response(service)
 
 
-@router.get("", response_model=list[ServiceResponse])
+@router.get("", response_model=list[ServiceResponse], responses={422: {"model": ErrorResponse}})
 def list_services_endpoint(db: Session = Depends(get_db)) -> list[ServiceResponse]:
     return [_service_response(service) for service in list_services(db)]
 
@@ -60,6 +66,10 @@ def list_services_endpoint(db: Session = Depends(get_db)) -> list[ServiceRespons
     "/{service_id}/events",
     response_model=ServiceEventResponse,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        404: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
 )
 def create_service_event_endpoint(
     service_id: UUID,
@@ -84,6 +94,7 @@ def create_service_event_endpoint(
 @router.get(
     "/{service_id}/events",
     response_model=list[ServiceEventResponse],
+    responses={404: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
 )
 def list_service_events_endpoint(
     service_id: UUID,
@@ -98,6 +109,11 @@ def list_service_events_endpoint(
 @router.post(
     "/{service_id}/events/{event_id}/resolve",
     response_model=ServiceEventResponse,
+    responses={
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
 )
 def resolve_service_event_endpoint(
     service_id: UUID,
