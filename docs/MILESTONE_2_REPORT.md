@@ -2,14 +2,10 @@
 
 ## Status
 
-**Implemented:** dependency locking, PostgreSQL domain models, initial Alembic
-migration, Docker Compose configuration, status derivation, and guarded
-integration-test structure.
-
-**Not verified:** applying the migration or running integration tests against a
-live database. Native PostgreSQL administrator access is unavailable
-non-interactively, and Docker containers were not started because the approval
-requires separate authorization before starting them.
+**Milestone 2 status:** verified successfully for the native PostgreSQL 18
+development path. Docker Compose support is implemented and its configuration
+was validated, but the Docker database runtime was not started during this
+verification.
 
 ## Implemented
 
@@ -34,14 +30,23 @@ requires separate authorization before starting them.
 | Check | Result |
 |---|---|
 | `uv lock --check` | PASS |
-| `uv sync --extra test --extra dev` | PASS |
-| `uv run ruff check app tests` | PASS |
-| `uv run pytest` | PASS: 5 passed, 2 skipped |
-| `uv run alembic heads/history` | PASS |
-| `uv run alembic upgrade head --sql` | PASS: expected PostgreSQL DDL generated |
-| `docker compose config` | PASS; no service started |
-| Native PostgreSQL migration | NOT VERIFIED: dedicated credentials unavailable |
-| Docker PostgreSQL migration | NOT VERIFIED: container start authorization not provided |
+| `uv run --locked ruff check .` | PASS |
+| `uv run --locked python -m compileall -q app tests` | PASS |
+| `uv run --locked pytest` with both local database URLs exported | PASS: 7 passed |
+| `uv run --locked alembic heads` | PASS: `20260301_0001` |
+| `uv run --locked alembic upgrade head` | PASS against native PostgreSQL 18 |
+| Repeated `uv run --locked alembic upgrade head` | PASS; database remained at head |
+| `uv run --locked alembic current` | PASS: `20260301_0001 (head)` |
+| Native PostgreSQL readiness | PASS: `127.0.0.1:5432` accepting connections |
+| Native PostgreSQL migration | PASS against dedicated `cloudxzen` database |
+| PostgreSQL integration tests | PASS: 2 passed against separate `cloudxzen_test` database |
+| Live schema inspection | PASS: both tables, one foreign key, six checks, and the event index present |
+| `docker compose config --quiet` | PASS; no service started |
+| Docker PostgreSQL migration | NOT VERIFIED: Docker database runtime was not started |
+
+The local `.env` file contains the configured development and test URLs, is
+ignored by Git, and was restricted to mode `600`. No credential values are
+recorded in this report.
 
 ## Schema decisions
 
@@ -52,8 +57,9 @@ cannot have a resolution timestamp, and resolutions cannot precede occurrence.
 
 ## Remaining work
 
-1. Provision a dedicated least-privilege native `cloudxzen` role and separate
-   `cloudxzen_test` database, or authorize starting the local Compose database.
-2. Set `DATABASE_URL` and `TEST_DATABASE_URL` with local credentials.
-3. Apply the migration and run integration tests against PostgreSQL 18.
-4. Inspect the resulting schema and constraints before beginning Milestone 3.
+1. Optionally verify the same migration and integration tests against the Docker
+   PostgreSQL 18 service on loopback port `5433`.
+2. Review and approve the Milestone 2 checkpoint before beginning Milestone 3.
+
+Milestone 3 remains out of scope for this report. No service API endpoints,
+frontend work, authentication, cloud infrastructure, or deployment was added.
