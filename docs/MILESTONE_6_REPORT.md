@@ -179,6 +179,11 @@ npm test: passed; 1 test file, 1 test
 npm run build: passed; Next.js 15.5.28 production build
 ```
 
+During this review, a clean `npm ci` exposed that ESLint was scanning generated
+`.next` output when run after a previous build. ESLint now ignores generated
+`.next`, `out`, and dependency directories. The corrected `npm run lint`
+passed after this change.
+
 The backend regression verification was rerun from `apps/api`:
 
 ```text
@@ -194,10 +199,12 @@ git diff --check: passed
 | Commit | Description | Remote status |
 |---|---|---|
 | `6625653` | Establish Next.js foundation | Pushed to `origin/main` |
+| `e2b152c` | Complete Milestone 6 report | Pushed to `origin/main` |
 
 Before the frontend checkpoint, local `main` and `origin/main` were aligned
-with divergence `0 0`. The current documentation checkpoint will be verified
-and pushed separately after this report and the roadmap are staged together.
+with divergence `0 0`. The documentation checkpoint was subsequently
+committed as `e2b152c`, and Git verification confirms it is present on
+`origin/main`.
 
 ## Completion Assessment
 

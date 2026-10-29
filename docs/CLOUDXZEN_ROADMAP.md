@@ -2,12 +2,26 @@
 
 ## Current repository assessment
 
-The repository is still in the initial planning stage:
+The opening roadmap sections below preserve the original planning context, but
+the repository has since progressed through Milestones 0–6. The current
+verified state is:
 
-- The only tracked file is `README.md`.
-- The specification exists in `docs/CloudXzen_Master_Project_Specification.md` and `docs/CloudXzen.pdf`.
-- There is no application code, package manifest, database schema, Docker configuration, CI workflow, IaC, or tests yet.
-- The repository has not yet started real product implementation.
+- the modular-monolith backend is implemented in `apps/api` with FastAPI,
+  PostgreSQL, SQLAlchemy, Alembic, tests, and documented quality checks;
+- the Next.js 15 frontend foundation is implemented in `apps/web` with
+  TypeScript, Tailwind CSS, tests, and production build checks;
+- Milestones 0–6 are complete where their milestone sections below record
+  verified evidence;
+- Milestone 7, Frontend/API integration, is the next planned milestone and
+  has not started;
+- the current product API uses root `/services` routes while `/api/v1` remains
+  an unresolved compatibility decision;
+- local development continues to target KSh 0 and the modular-monolith
+  architecture.
+
+The historical planning baseline was written before implementation began. Its
+recommendations remain useful context, but statements describing an empty
+repository are no longer current status claims.
 
 ## 1. Recommended product/domain
 
