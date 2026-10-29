@@ -689,18 +689,37 @@ test(api): verify production docs and migrations
 
 ### Milestone 6 — Frontend foundation
 
+**Status: Complete and verified.**
+
 Achievements:
 
-- Next.js bootstrap
-- TypeScript setup
-- Tailwind integration
-- UI primitives and app shell
-- lint/typecheck/test commands
+- Next.js 15.5 App Router bootstrap in `apps/web`
+- React 19 and strict TypeScript setup
+- Tailwind CSS v4 integration
+- responsive accessible application shell and entry page
+- loading, error, and not-found boundaries
+- focused Vitest/Testing Library test foundation
+- lint, type-check, npm audit, and production build commands
+- local frontend setup documentation
+
+Verified results:
+
+- clean `npm ci` installation with zero npm audit vulnerabilities;
+- frontend lint passed;
+- frontend type-check passed;
+- frontend tests passed: 1 test;
+- frontend production build passed;
+- backend regression suite passed: 54 tests;
+- backend Ruff, compilation, lock, and diff checks passed.
+
+The complete handoff report is
+[`docs/MILESTONE_6_REPORT.md`](MILESTONE_6_REPORT.md). Frontend/API
+integration remains deferred to Milestone 7.
 
 Git checkpoint:
 
 ```text
-feat: bootstrap Next.js web application
+feat(frontend): establish Next.js foundation
 ```
 
 ### Milestone 7 — Frontend/API integration
