@@ -24,6 +24,8 @@ The MVP does not include external polling, alerting, billing, AI/ML, multi-regio
 - Product and architecture roadmap.
 - Zero-cost and provider-portable project policy.
 - FastAPI backend foundation with a tested `/health` endpoint.
+- Service schemas, repository functions, and `POST /services` and
+  `GET /services` endpoints backed by PostgreSQL.
 
 ### Planned
 
@@ -88,6 +90,8 @@ Environment variables are documented in [.env.example](./.env.example). Never co
 - [Cost and free-tier policy](./docs/COST_AND_FREE_TIER.md)
 - [Milestone 0 report](./docs/MILESTONE_0_REPORT.md)
 - [Milestone 1 report](./docs/MILESTONE_1_REPORT.md)
+- [Milestone 2 report](./docs/MILESTONE_2_REPORT.md)
+- [Milestone 3 report](./docs/MILESTONE_3_REPORT.md)
 - [Pre-Milestone 2 remediation report](./docs/PRE_MILESTONE_2_REMEDIATION_REPORT.md)
 - [PostgreSQL development strategy](./docs/POSTGRESQL_DEVELOPMENT.md)
 - [Backend README](./apps/api/README.md)
