@@ -210,3 +210,90 @@ def test_create_event_returns_not_found_for_missing_service(
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Service not found"
+
+
+def test_list_service_events_returns_empty_array_for_new_service(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        return await api_client.get(f"/services/{service_response.json()['id']}/events")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_list_service_events_returns_newest_first_and_scoped_history(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> tuple[httpx.Response, str, str]:
+        first_service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        first_service_id = first_service_response.json()["id"]
+        second_service_response = await api_client.post(
+            "/services",
+            json={"name": "Search", "environment": "production"},
+        )
+        second_service_id = second_service_response.json()["id"]
+
+        older_response = await api_client.post(
+            f"/services/{first_service_id}/events",
+            json={
+                "event_type": "check",
+                "status": "degraded",
+                "summary": "High latency",
+                "occurred_at": "2026-10-29T17:00:00+00:00",
+            },
+        )
+        newer_response = await api_client.post(
+            f"/services/{first_service_id}/events",
+            json={
+                "event_type": "check",
+                "status": "operational",
+                "summary": "Latency recovered",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        await api_client.post(
+            f"/services/{second_service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Search unavailable",
+                "occurred_at": "2026-10-29T19:00:00+00:00",
+            },
+        )
+        history_response = await api_client.get(
+            f"/services/{first_service_id}/events"
+        )
+        return history_response, older_response.json()["id"], newer_response.json()["id"]
+
+    response, older_id, newer_id = asyncio.run(request())
+    events = response.json()
+
+    assert response.status_code == 200
+    assert [event["id"] for event in events] == [newer_id, older_id]
+    assert [event["summary"] for event in events] == [
+        "Latency recovered",
+        "High latency",
+    ]
+    assert all(event["event_type"] == "check" for event in events)
+
+
+def test_list_service_events_returns_not_found_for_missing_service(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        return await api_client.get(f"/services/{uuid4()}/events")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Service not found"

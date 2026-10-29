@@ -10,6 +10,7 @@ from app.domains.services.repository import (
     create_service,
     create_service_event,
     get_service,
+    list_service_events,
     list_services,
 )
 from app.domains.services.schemas import (
@@ -68,3 +69,17 @@ def create_service_event_endpoint(
         raise
 
     return event
+
+
+@router.get(
+    "/{service_id}/events",
+    response_model=list[ServiceEventResponse],
+)
+def list_service_events_endpoint(
+    service_id: UUID,
+    db: Session = Depends(get_db),
+) -> list[ServiceEventResponse]:
+    if get_service(db, service_id) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+
+    return list_service_events(db, service_id)

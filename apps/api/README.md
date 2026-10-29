@@ -124,6 +124,36 @@ Incident events cannot use `operational` status. A successful request returns
 Invalid request data returns `422` with the API validation-error envelope.
 If the service does not exist, the endpoint returns `404 Not Found`.
 
+List a service's event history:
+
+```http
+GET /services/{service_id}/events
+```
+
+The `service_id` path parameter identifies the registered service. A successful
+request returns `200 OK` with a bare JSON array of events ordered newest first
+by occurrence time, with creation time and event ID as deterministic
+tie-breakers:
+
+```json
+[
+  {
+    "id": "8f9a7c7d-8a7a-4f4e-9f31-8e3f53f4f3d9",
+    "service_id": "d4c7f7d8-6f7a-4b6c-a2e4-8e4d7f0b4a1f",
+    "event_type": "check",
+    "status": "operational",
+    "summary": "Latency recovered",
+    "details": null,
+    "occurred_at": "2026-10-29T18:00:00+00:00",
+    "resolved_at": null,
+    "created_at": "2026-10-29T18:00:01+00:00"
+  }
+]
+```
+
+An existing service with no events returns `200 OK` and an empty array.
+If the service does not exist, the endpoint returns `404 Not Found`.
+
 ## OpenAPI documentation
 
 When running in development, FastAPI exposes:
