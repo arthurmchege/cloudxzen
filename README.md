@@ -26,10 +26,12 @@ The MVP does not include external polling, alerting, billing, AI/ML, multi-regio
 - FastAPI backend foundation with a tested `/health` endpoint.
 - Service schemas, repository functions, and `POST /services` and
   `GET /services` endpoints backed by PostgreSQL.
+- Next.js frontend foundation with an accessible application shell and
+  verified local quality/build commands.
 
 ### Planned
 
-- Next.js web application.
+- Frontend/API integration and service workflows.
 - FastAPI backend.
 - PostgreSQL persistence.
 - Automated unit, integration, API, frontend, and selected end-to-end tests.
@@ -78,7 +80,7 @@ Technologies listed as planned are not claims of completed implementation.
 
 ## Local development
 
-Local development will use free and open-source tooling. PostgreSQL may run directly on the host or through Docker. Application-specific setup instructions will be added when the frontend and backend are bootstrapped.
+Local development will use free and open-source tooling. PostgreSQL may run directly on the host or through Docker. The backend setup is documented in [apps/api/README.md](./apps/api/README.md), and the frontend setup is documented in [apps/web/README.md](./apps/web/README.md).
 
 Environment variables are documented in [.env.example](./.env.example). Never commit a real `.env` file or credentials.
 
@@ -95,6 +97,9 @@ Environment variables are documented in [.env.example](./.env.example). Never co
 - [Pre-Milestone 2 remediation report](./docs/PRE_MILESTONE_2_REMEDIATION_REPORT.md)
 - [PostgreSQL development strategy](./docs/POSTGRESQL_DEVELOPMENT.md)
 - [Backend README](./apps/api/README.md)
+- [Frontend README](./apps/web/README.md)
+- [Milestone 5 report](./docs/MILESTONE_5_REPORT.md)
+- [Milestone 6 report](./docs/MILESTONE_6_REPORT.md)
 - [Architecture decisions](./docs/adr/)
 
 ## Cost policy
