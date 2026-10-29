@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -6,12 +7,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.domains.services.models import EventType
 from app.domains.services.repository import (
     create_service,
     create_service_event,
     get_service,
+    get_service_event,
     list_service_events,
     list_services,
+    resolve_service_event,
 )
 from app.domains.services.schemas import (
     ServiceCreate,
@@ -83,3 +87,41 @@ def list_service_events_endpoint(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
 
     return list_service_events(db, service_id)
+
+
+@router.post(
+    "/{service_id}/events/{event_id}/resolve",
+    response_model=ServiceEventResponse,
+)
+def resolve_service_event_endpoint(
+    service_id: UUID,
+    event_id: UUID,
+    db: Session = Depends(get_db),
+) -> ServiceEventResponse:
+    if get_service(db, service_id) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+
+    event = get_service_event(db, service_id, event_id)
+    if event is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+    if event.event_type != EventType.INCIDENT:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Only incident events can be resolved",
+        )
+    if event.resolved_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Incident is already resolved",
+        )
+
+    try:
+        event = resolve_service_event(db, event, datetime.now(UTC))
+        db.commit()
+        db.refresh(event)
+    except SQLAlchemyError:
+        db.rollback()
+        logger.exception("service_event_resolution_failed")
+        raise
+
+    return event

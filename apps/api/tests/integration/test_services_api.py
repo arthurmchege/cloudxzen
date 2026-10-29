@@ -1,14 +1,16 @@
 import asyncio
 import os
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import httpx
 import pytest
 from sqlalchemy import create_engine, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.api.routes import services as services_routes
 from app.api.routes.services import get_db
 from app.db.base import Base
 from app.domains.services.models import ServiceEvent
@@ -297,3 +299,252 @@ def test_list_service_events_returns_not_found_for_missing_service(
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Service not found"
+
+
+def test_resolve_incident_sets_server_generated_timestamp(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> tuple[httpx.Response, datetime, datetime]:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        event_id = event_response.json()["id"]
+        before = datetime.now(UTC)
+        resolved_response = await api_client.post(
+            f"/services/{service_id}/events/{event_id}/resolve"
+        )
+        after = datetime.now(UTC)
+        return resolved_response, before, after
+
+    response, before, after = asyncio.run(request())
+    resolved_at = datetime.fromisoformat(response.json()["resolved_at"])
+
+    assert response.status_code == 200
+    assert resolved_at.tzinfo is not None
+    assert before <= resolved_at <= after
+    assert response.json()["event_type"] == "incident"
+    assert response.json()["status"] == "down"
+
+
+def test_resolve_incident_persists_timestamp(api_client: httpx.AsyncClient) -> None:
+    async def request() -> tuple[httpx.Response, str, str]:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Search", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "degraded",
+                "summary": "Search degraded",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        event_id = event_response.json()["id"]
+        resolved_response = await api_client.post(
+            f"/services/{service_id}/events/{event_id}/resolve"
+        )
+        return resolved_response, service_id, event_id
+
+    response, service_id, event_id = asyncio.run(request())
+    engine = create_engine(TEST_DATABASE_URL)
+    with Session(engine) as session:
+        stored = session.scalar(
+            select(ServiceEvent).where(
+                ServiceEvent.id == event_id,
+                ServiceEvent.service_id == service_id,
+            )
+        )
+    engine.dispose()
+
+    assert response.status_code == 200
+    assert stored is not None
+    assert stored.resolved_at is not None
+    assert stored.resolved_at.tzinfo is not None
+
+
+def test_resolve_event_returns_not_found_for_missing_service(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        return await api_client.post(
+            f"/services/{uuid4()}/events/{uuid4()}/resolve"
+        )
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Service not found"
+
+
+def test_resolve_event_returns_not_found_for_missing_event(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        return await api_client.post(
+            f"/services/{service_response.json()['id']}/events/{uuid4()}/resolve"
+        )
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Event not found"
+
+
+def test_resolve_event_is_scoped_to_service(api_client: httpx.AsyncClient) -> None:
+    async def request() -> httpx.Response:
+        first_service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        second_service_response = await api_client.post(
+            "/services",
+            json={"name": "Search", "environment": "production"},
+        )
+        first_service_id = first_service_response.json()["id"]
+        second_service_id = second_service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{first_service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        return await api_client.post(
+            f"/services/{second_service_id}/events/"
+            f"{event_response.json()['id']}/resolve"
+        )
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Event not found"
+
+
+def test_resolve_check_returns_conflict(api_client: httpx.AsyncClient) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "check",
+                "status": "operational",
+                "summary": "Health check passed",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        return await api_client.post(
+            f"/services/{service_id}/events/"
+            f"{event_response.json()['id']}/resolve"
+        )
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Only incident events can be resolved"
+
+
+def test_resolve_already_resolved_incident_returns_conflict(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> tuple[httpx.Response, httpx.Response]:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        event_id = event_response.json()["id"]
+        first_resolution = await api_client.post(
+            f"/services/{service_id}/events/{event_id}/resolve"
+        )
+        second_resolution = await api_client.post(
+            f"/services/{service_id}/events/{event_id}/resolve"
+        )
+        return first_resolution, second_resolution
+
+    first_response, second_response = asyncio.run(request())
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 409
+    assert second_response.json()["detail"] == "Incident is already resolved"
+
+
+def test_resolve_database_error_returns_generic_error_and_rolls_back(
+    api_client: httpx.AsyncClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def request() -> tuple[httpx.Response, str]:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        return (
+            await api_client.post(
+                f"/services/{service_id}/events/"
+                f"{event_response.json()['id']}/resolve"
+            ),
+            event_response.json()["id"],
+        )
+
+    def fail_resolution(*args: object, **kwargs: object) -> None:
+        raise SQLAlchemyError("simulated database failure")
+
+    monkeypatch.setattr(services_routes, "resolve_service_event", fail_resolution)
+    response, event_id = asyncio.run(request())
+
+    engine = create_engine(TEST_DATABASE_URL)
+    with Session(engine) as session:
+        stored = session.get(ServiceEvent, event_id)
+    engine.dispose()
+
+    assert response.status_code == 500
+    assert response.json() == {
+        "error": {
+            "code": "database_error",
+            "message": "The request could not be completed.",
+        }
+    }
+    assert stored is not None
+    assert stored.resolved_at is None

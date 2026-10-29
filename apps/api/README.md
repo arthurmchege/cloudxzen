@@ -154,6 +154,34 @@ tie-breakers:
 An existing service with no events returns `200 OK` and an empty array.
 If the service does not exist, the endpoint returns `404 Not Found`.
 
+Resolve an incident:
+
+```http
+POST /services/{service_id}/events/{event_id}/resolve
+```
+
+The `service_id` and `event_id` path parameters identify the service and its
+incident event. The request has no body. The server generates a timezone-aware
+UTC `resolved_at` timestamp and returns the updated event with `200 OK`:
+
+```json
+{
+  "id": "8f9a7c7d-8a7a-4f4e-9f31-8e3f53f4f3d9",
+  "service_id": "d4c7f7d8-6f7a-4b6c-a2e4-8e4d7f0b4a1f",
+  "event_type": "incident",
+  "status": "down",
+  "summary": "Payments unavailable",
+  "details": "HTTP 503 responses",
+  "occurred_at": "2026-10-29T18:00:00+00:00",
+  "resolved_at": "2026-10-29T22:29:00+00:00",
+  "created_at": "2026-10-29T18:00:01+00:00"
+}
+```
+
+If the service or matching event does not exist, the endpoint returns `404 Not
+Found`. Resolving a health-check event or an already-resolved incident returns
+`409 Conflict`.
+
 ## OpenAPI documentation
 
 When running in development, FastAPI exposes:

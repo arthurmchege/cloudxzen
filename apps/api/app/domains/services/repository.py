@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import select
@@ -68,3 +69,13 @@ def get_service_event(
         ServiceEvent.id == event_id,
     )
     return session.scalar(statement)
+
+
+def resolve_service_event(
+    session: Session,
+    event: ServiceEvent,
+    resolved_at: datetime,
+) -> ServiceEvent:
+    event.resolved_at = resolved_at
+    session.flush()
+    return event
