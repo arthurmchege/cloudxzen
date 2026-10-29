@@ -585,8 +585,9 @@ feat: bootstrap FastAPI service
 
 ### Milestone 2 — Database foundation
 
-**Status:** Implemented locally; live PostgreSQL execution is pending explicit
-database credentials or container-start authorization.
+**Status:** Verified successfully against native PostgreSQL 18. Docker Compose
+configuration is implemented and validated, but the Docker database runtime
+has not been verified.
 
 Achievements:
 

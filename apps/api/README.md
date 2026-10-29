@@ -2,8 +2,8 @@
 
 ## Status
 
-The API foundation and initial service database schema are implemented. Service
-HTTP routes remain intentionally deferred to a later milestone.
+The API foundation, initial service database schema, and first service HTTP
+routes are implemented.
 
 ## Requirements
 
@@ -29,7 +29,8 @@ The repository root `.env.example` documents the currently supported environment
 | `DATABASE_URL` | No | SQLAlchemy PostgreSQL URL for the selected development database. |
 | `TEST_DATABASE_URL` | No | Explicit PostgreSQL URL for destructive integration-test setup. Tests refuse to use `DATABASE_URL`. |
 
-The health endpoint does not connect to PostgreSQL yet. The default database URL is a local placeholder for the future database foundation, not a credential.
+The health endpoint does not connect to PostgreSQL. Service routes use the
+configured PostgreSQL database and require a working `DATABASE_URL`.
 
 Validation failures use a structured `validation_error` response. Requests receive an `X-Request-ID` response header, and request completion/failure is logged with method, path, status, duration, and the request ID.
 
@@ -55,7 +56,34 @@ Example response:
 {"status":"ok"}
 ```
 
-`/health` is intentionally outside `/api/v1` because it is an infrastructure/process health check. It does not check PostgreSQL or other external dependencies. Future product routes will use the `/api/v1` namespace.
+`/health` is an infrastructure/process health check. It does not check
+PostgreSQL or other external dependencies. The initial product routes use the
+root `/services` paths defined below; introducing a versioned API namespace is
+deferred until it is justified by the API contract.
+
+## Service endpoints
+
+The first product endpoints are available at the root service paths:
+
+```http
+POST /services
+GET /services
+```
+
+Create a service:
+
+```json
+{
+  "name": "Payments",
+  "description": "Payment processing",
+  "environment": "production"
+}
+```
+
+`POST /services` returns `201 Created` with the created service. `GET
+/services` returns a bare JSON array ordered by newest creation timestamp, with
+the service ID as a deterministic tie-breaker. Authentication, ownership,
+pagination, and service-event endpoints are outside this milestone.
 
 ## OpenAPI documentation
 

@@ -1,6 +1,7 @@
 import asyncio
 import os
 from collections.abc import Iterator
+from datetime import datetime
 
 import httpx
 import pytest
@@ -63,3 +64,38 @@ def test_create_and_list_services(api_client: httpx.AsyncClient) -> None:
     assert created.json()["name"] == "Payments"
     assert listed.status_code == 200
     assert listed.json()[0]["id"] == created.json()["id"]
+
+
+def test_list_services_returns_empty_array(api_client: httpx.AsyncClient) -> None:
+    async def request() -> httpx.Response:
+        return await api_client.get("/services")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_list_services_uses_deterministic_order(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        await api_client.post(
+            "/services",
+            json={"name": "Search", "environment": "production"},
+        )
+        return await api_client.get("/services")
+
+    response = asyncio.run(request())
+    services = response.json()
+    ordering = [
+        (datetime.fromisoformat(service["created_at"]), service["id"])
+        for service in services
+    ]
+
+    assert response.status_code == 200
+    assert ordering == sorted(ordering, reverse=True)
