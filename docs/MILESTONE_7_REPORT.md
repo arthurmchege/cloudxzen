@@ -241,15 +241,28 @@ The 31 skipped tests require the separately configured PostgreSQL
 The previously verified backend checkpoint remains documented in the
 Milestone 5 and Milestone 6 reports.
 
+## Git Checkpoints
+
+| Commit | Description | Remote status |
+|---|---|---|
+| `6a5b451` | Start Milestone 7 report | Pushed to `origin/main` |
+| `23657d0` | Integrate service reliability workflows | Pushed to `origin/main` |
+
+Before the implementation checkpoint, `git fetch origin main` confirmed local
+`main` and `origin/main` had divergence `0 0`. The implementation commit was
+then pushed as a fast-forward. The current worktree is clean and local
+`main` remains synchronized with `origin/main`.
+
 ## Current Status
 
 **In Progress — the initial live integration is implemented and verified
 locally, but the milestone is not yet complete.**
 
 Remaining work includes broader user-visible tests for service details and
-event actions, a final review of API-client contracts, full verification with
-the safe PostgreSQL test configuration where available, roadmap reconciliation,
-and a final Git checkpoint.
+event actions, a final review of API-client contracts, and full verification
+with the safe PostgreSQL test configuration where available. The integration
+checkpoint is already pushed; only the final milestone documentation
+reconciliation remains for this implementation stage.
 
 ## Next Action
 
