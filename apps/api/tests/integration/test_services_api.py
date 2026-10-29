@@ -66,8 +66,10 @@ def test_create_and_list_services(api_client: httpx.AsyncClient) -> None:
 
     assert created.status_code == 201
     assert created.json()["name"] == "Payments"
+    assert created.json()["status"] == "unknown"
     assert listed.status_code == 200
     assert listed.json()[0]["id"] == created.json()["id"]
+    assert listed.json()[0]["status"] == "unknown"
 
 
 def test_list_services_returns_empty_array(api_client: httpx.AsyncClient) -> None:
@@ -103,6 +105,94 @@ def test_list_services_uses_deterministic_order(
 
     assert response.status_code == 200
     assert ordering == sorted(ordering, reverse=True)
+
+
+def test_service_status_reflects_latest_check(api_client: httpx.AsyncClient) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "check",
+                "status": "degraded",
+                "summary": "High latency",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        return await api_client.get("/services")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json()[0]["status"] == "degraded"
+
+
+def test_service_status_returns_operational_after_resolved_incident(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        event_response = await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        await api_client.post(
+            f"/services/{service_id}/events/{event_response.json()['id']}/resolve"
+        )
+        return await api_client.get("/services")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json()[0]["status"] == "operational"
+
+
+def test_service_status_uses_newest_unresolved_incident(
+    api_client: httpx.AsyncClient,
+) -> None:
+    async def request() -> httpx.Response:
+        service_response = await api_client.post(
+            "/services",
+            json={"name": "Payments", "environment": "production"},
+        )
+        service_id = service_response.json()["id"]
+        await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "degraded",
+                "summary": "Elevated latency",
+                "occurred_at": "2026-10-29T18:00:00+00:00",
+            },
+        )
+        await api_client.post(
+            f"/services/{service_id}/events",
+            json={
+                "event_type": "incident",
+                "status": "down",
+                "summary": "Payments unavailable",
+                "occurred_at": "2026-10-29T19:00:00+00:00",
+            },
+        )
+        return await api_client.get("/services")
+
+    response = asyncio.run(request())
+
+    assert response.status_code == 200
+    assert response.json()[0]["status"] == "down"
 
 
 def test_create_check_event(api_client: httpx.AsyncClient) -> None:

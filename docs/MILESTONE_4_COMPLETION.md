@@ -6,9 +6,10 @@ Milestone 4, **Core service-event workflow**, is implemented for the currently
 defined backend scope and has been verified against the repository's PostgreSQL
 test database.
 
-This report is based on the implementation at commit `c4757c8` and the
-verification commands recorded below. It distinguishes implemented behavior
-from work that remains outside this milestone's completed scope.
+This report covers the implementation from the completed application
+checkpoints and the status integration documented in this checkpoint. It
+distinguishes implemented behavior from work that remains outside this
+milestone's completed scope.
 
 ## Objectives and scope
 
@@ -137,9 +138,9 @@ The verified rules are:
 4. a history containing only resolved incidents produces `operational`.
 
 Events are sorted using occurrence time, creation time, and event ID before
-derivation. The status function is covered by unit tests, but Milestone 4 does
-not expose a dedicated service-status API endpoint or include derived status in
-the current service response.
+derivation. The service create and list responses include the derived
+`status` field. There is no separate service-status API endpoint; status is
+exposed as part of the service representation.
 
 ## Database behavior and constraints
 
@@ -238,8 +239,8 @@ At the time of this report, `main` and `origin/main` both point to
 The following items are not claimed as completed by this report:
 
 - There is no dedicated endpoint for returning a derived service status.
-- The current service response does not include derived status or a status
-  summary.
+- The service response does not include a separate status explanation or the
+  event that caused the status.
 - Multiple unresolved incidents are allowed; the current derivation function
   returns the newest unresolved incident according to its deterministic
   ordering. A product decision may be needed if only one active incident

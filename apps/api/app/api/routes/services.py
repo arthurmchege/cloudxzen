@@ -23,9 +23,15 @@ from app.domains.services.schemas import (
     ServiceEventResponse,
     ServiceResponse,
 )
+from app.domains.services.status import derive_service_status
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/services", tags=["services"])
+
+
+def _service_response(service) -> ServiceResponse:
+    response = ServiceResponse.model_validate(service)
+    return response.model_copy(update={"status": derive_service_status(service.events)})
 
 
 @router.post("", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)
@@ -42,12 +48,12 @@ def create_service_endpoint(
         logger.exception("service_creation_failed")
         raise
 
-    return service
+    return _service_response(service)
 
 
 @router.get("", response_model=list[ServiceResponse])
 def list_services_endpoint(db: Session = Depends(get_db)) -> list[ServiceResponse]:
-    return list_services(db)
+    return [_service_response(service) for service in list_services(db)]
 
 
 @router.post(

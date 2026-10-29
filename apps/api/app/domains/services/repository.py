@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.domains.services.models import Service, ServiceEvent
 from app.domains.services.schemas import ServiceCreate, ServiceEventCreate
@@ -20,7 +20,11 @@ def create_service(session: Session, data: ServiceCreate) -> Service:
 
 
 def list_services(session: Session) -> list[Service]:
-    statement = select(Service).order_by(Service.created_at.desc(), Service.id.desc())
+    statement = (
+        select(Service)
+        .options(selectinload(Service.events))
+        .order_by(Service.created_at.desc(), Service.id.desc())
+    )
     return list(session.scalars(statement))
 
 

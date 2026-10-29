@@ -630,6 +630,7 @@ Achievements:
 - event creation
 - event history API
 - status derivation
+- derived status in service API responses
 - incident resolution
 - unit/integration tests
 - documentation updates

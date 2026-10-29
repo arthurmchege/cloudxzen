@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.domains.services.models import EventType, ServiceEventStatus
+from app.domains.services.models import EventType, ServiceEventStatus, ServiceStatus
 
 
 class ServiceCreate(BaseModel):
@@ -26,6 +26,7 @@ class ServiceResponse(BaseModel):
     name: str
     description: str | None
     environment: str
+    status: ServiceStatus = ServiceStatus.UNKNOWN
     created_at: datetime
     updated_at: datetime
 

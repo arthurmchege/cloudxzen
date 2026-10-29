@@ -82,8 +82,12 @@ Create a service:
 
 `POST /services` returns `201 Created` with the created service. `GET
 /services` returns a bare JSON array ordered by newest creation timestamp, with
-the service ID as a deterministic tie-breaker. Authentication, ownership,
-and pagination are outside this milestone.
+the service ID as a deterministic tie-breaker. Each service response includes
+derived `status`: `unknown` with no events, the latest check status when there
+are no unresolved incidents, the newest unresolved incident status when one or
+more incidents are active, and `operational` when the service has only resolved
+incidents. Authentication, ownership, and pagination are outside this
+milestone.
 
 Create a service event:
 

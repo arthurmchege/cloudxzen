@@ -5,8 +5,14 @@ from app.domains.services.models import ServiceEvent
 from app.domains.services.status import derive_service_status
 
 
-def event(event_type: str, status: str, *, resolved: bool = False) -> ServiceEvent:
-    occurred_at = datetime(2026, 1, 1, tzinfo=UTC)
+def event(
+    event_type: str,
+    status: str,
+    *,
+    resolved: bool = False,
+    occurred_at: datetime | None = None,
+) -> ServiceEvent:
+    occurred_at = occurred_at or datetime(2026, 1, 1, tzinfo=UTC)
     return ServiceEvent(
         id=uuid4(),
         service_id=uuid4(),
@@ -38,3 +44,20 @@ def test_only_resolved_incidents_mean_operational() -> None:
     assert derive_service_status([event("incident", "down", resolved=True)]).value == (
         "operational"
     )
+
+
+def test_newest_unresolved_incident_wins_when_multiple_are_active() -> None:
+    assert derive_service_status(
+        [
+            event(
+                "incident",
+                "degraded",
+                occurred_at=datetime(2026, 1, 1, tzinfo=UTC),
+            ),
+            event(
+                "incident",
+                "down",
+                occurred_at=datetime(2026, 1, 2, tzinfo=UTC),
+            ),
+        ]
+    ).value == "down"
