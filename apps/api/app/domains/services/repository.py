@@ -23,6 +23,10 @@ def list_services(session: Session) -> list[Service]:
     return list(session.scalars(statement))
 
 
+def get_service(session: Session, service_id: UUID) -> Service | None:
+    return session.get(Service, service_id)
+
+
 def create_service_event(
     session: Session,
     service_id: UUID,

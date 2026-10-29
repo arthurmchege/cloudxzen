@@ -83,7 +83,46 @@ Create a service:
 `POST /services` returns `201 Created` with the created service. `GET
 /services` returns a bare JSON array ordered by newest creation timestamp, with
 the service ID as a deterministic tie-breaker. Authentication, ownership,
-pagination, and service-event endpoints are outside this milestone.
+and pagination are outside this milestone.
+
+Create a service event:
+
+```http
+POST /services/{service_id}/events
+Content-Type: application/json
+```
+
+```json
+{
+  "event_type": "incident",
+  "status": "down",
+  "summary": "Payments unavailable",
+  "details": "HTTP 503 responses",
+  "occurred_at": "2026-10-29T18:00:00+00:00"
+}
+```
+
+`event_type`, `status`, `summary`, and `occurred_at` are required.
+`details` is optional. `occurred_at` must include timezone information.
+Incident events cannot use `operational` status. A successful request returns
+`201 Created`:
+
+```json
+{
+  "id": "8f9a7c7d-8a7a-4f4e-9f31-8e3f53f4f3d9",
+  "service_id": "d4c7f7d8-6f7a-4b6c-a2e4-8e4d7f0b4a1f",
+  "event_type": "incident",
+  "status": "down",
+  "summary": "Payments unavailable",
+  "details": "HTTP 503 responses",
+  "occurred_at": "2026-10-29T18:00:00+00:00",
+  "resolved_at": null,
+  "created_at": "2026-10-29T18:00:01+00:00"
+}
+```
+
+Invalid request data returns `422` with the API validation-error envelope.
+If the service does not exist, the endpoint returns `404 Not Found`.
 
 ## OpenAPI documentation
 
