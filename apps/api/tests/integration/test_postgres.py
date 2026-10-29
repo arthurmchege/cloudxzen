@@ -10,8 +10,14 @@ from sqlalchemy.orm import Session
 
 from app.db.base import Base
 from app.domains.services.models import Service, ServiceEvent
-from app.domains.services.repository import create_service, list_services
-from app.domains.services.schemas import ServiceCreate
+from app.domains.services.repository import (
+    create_service,
+    create_service_event,
+    get_service_event,
+    list_service_events,
+    list_services,
+)
+from app.domains.services.schemas import ServiceCreate, ServiceEventCreate
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -83,3 +89,117 @@ def test_repository_creates_and_lists_services(db_session: Session) -> None:
 
     assert services == [created]
     assert services[0].name == "Payments"
+
+
+def test_repository_creates_and_retrieves_service_event(db_session: Session) -> None:
+    service = Service(name="Payments", environment="production")
+    db_session.add(service)
+    db_session.flush()
+    data = ServiceEventCreate(
+        event_type="incident",
+        status="down",
+        summary="Payments unavailable",
+        occurred_at=datetime(2026, 10, 29, 18, 0, tzinfo=UTC),
+    )
+
+    created = create_service_event(db_session, service.id, data)
+    retrieved = get_service_event(db_session, service.id, created.id)
+
+    assert retrieved is created
+    assert retrieved.service_id == service.id
+
+
+def test_repository_lists_service_events_newest_first(db_session: Session) -> None:
+    service = Service(name="Payments", environment="production")
+    db_session.add(service)
+    db_session.flush()
+    older = create_service_event(
+        db_session,
+        service.id,
+        ServiceEventCreate(
+            event_type="check",
+            status="degraded",
+            summary="High latency",
+            occurred_at=datetime(2026, 10, 29, 17, 0, tzinfo=UTC),
+        ),
+    )
+    newer = create_service_event(
+        db_session,
+        service.id,
+        ServiceEventCreate(
+            event_type="check",
+            status="operational",
+            summary="Latency recovered",
+            occurred_at=datetime(2026, 10, 29, 18, 0, tzinfo=UTC),
+        ),
+    )
+
+    events = list_service_events(db_session, service.id)
+
+    assert [event.id for event in events] == [newer.id, older.id]
+
+
+def test_repository_lists_empty_history_for_service_without_events(
+    db_session: Session,
+) -> None:
+    service = Service(name="Search", environment="production")
+    db_session.add(service)
+    db_session.flush()
+
+    assert list_service_events(db_session, service.id) == []
+
+
+def test_repository_scopes_event_lookup_to_service(db_session: Session) -> None:
+    first_service = Service(name="Payments", environment="production")
+    second_service = Service(name="Search", environment="production")
+    db_session.add_all([first_service, second_service])
+    db_session.flush()
+    event = create_service_event(
+        db_session,
+        first_service.id,
+        ServiceEventCreate(
+            event_type="check",
+            status="operational",
+            summary="Healthy",
+            occurred_at=datetime(2026, 10, 29, 18, 0, tzinfo=UTC),
+        ),
+    )
+
+    assert get_service_event(db_session, second_service.id, event.id) is None
+    assert get_service_event(db_session, first_service.id, uuid4()) is None
+
+
+def test_repository_rejects_event_for_missing_service(db_session: Session) -> None:
+    with pytest.raises(IntegrityError):
+        create_service_event(
+            db_session,
+            uuid4(),
+            ServiceEventCreate(
+                event_type="check",
+                status="operational",
+                summary="Orphan event",
+                occurred_at=datetime(2026, 10, 29, 18, 0, tzinfo=UTC),
+            ),
+        )
+
+    db_session.rollback()
+
+
+def test_repository_creation_does_not_commit(db_session: Session) -> None:
+    service = Service(name="Payments", environment="production")
+    db_session.add(service)
+    db_session.flush()
+    event = create_service_event(
+        db_session,
+        service.id,
+        ServiceEventCreate(
+            event_type="check",
+            status="operational",
+            summary="Healthy",
+            occurred_at=datetime(2026, 10, 29, 18, 0, tzinfo=UTC),
+        ),
+    )
+
+    db_session.rollback()
+
+    assert db_session.get(ServiceEvent, event.id) is None
