@@ -34,6 +34,8 @@ configured PostgreSQL database and require a working `DATABASE_URL`.
 
 Validation failures use a structured `validation_error` response. Route
 failures use the same envelope with `not_found` or `conflict` error codes.
+Unexpected database failures return HTTP `500` with `database_error`; internal
+database details are logged server-side and are not exposed to clients.
 Requests receive an `X-Request-ID` response header, and request
 completion/failure is logged with method, path, status, duration, and the
 request ID.
@@ -225,6 +227,10 @@ To run the configured linter:
 ```bash
 uv run ruff check app tests
 ```
+
+The PostgreSQL integration suite includes an Alembic migration verification
+that upgrades the dedicated `TEST_DATABASE_URL` database to `head` and cleans
+it back to `base`. It never uses `DATABASE_URL` for destructive setup.
 
 ## Database foundation
 

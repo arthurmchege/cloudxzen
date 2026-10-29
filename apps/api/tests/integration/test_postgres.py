@@ -1,13 +1,16 @@
 import os
 from collections.abc import Iterator
 from datetime import UTC, datetime
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from alembic.config import Config
 from sqlalchemy import create_engine, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from alembic import command
 from app.db.base import Base
 from app.domains.services.models import Service, ServiceEvent
 from app.domains.services.repository import (
@@ -26,6 +29,31 @@ pytestmark = pytest.mark.skipif(
     not TEST_DATABASE_URL,
     reason="TEST_DATABASE_URL is required for PostgreSQL integration tests",
 )
+
+
+def test_alembic_upgrade_creates_current_schema() -> None:
+    if not TEST_DATABASE_URL or TEST_DATABASE_URL == DATABASE_URL:
+        pytest.fail("TEST_DATABASE_URL must be separate from DATABASE_URL")
+
+    config = Config(str(Path(__file__).parents[2] / "alembic.ini"))
+    config.set_main_option("sqlalchemy.url", TEST_DATABASE_URL.replace("%", "%%"))
+    command.downgrade(config, "base")
+    try:
+        command.upgrade(config, "head")
+
+        engine = create_engine(TEST_DATABASE_URL)
+        with engine.connect() as connection:
+            table_names = set(
+                connection.exec_driver_sql(
+                    "SELECT tablename FROM pg_catalog.pg_tables "
+                    "WHERE schemaname = 'public'"
+                ).scalars()
+            )
+        engine.dispose()
+
+        assert {"services", "service_events", "alembic_version"} <= table_names
+    finally:
+        command.downgrade(config, "base")
 
 
 @pytest.fixture

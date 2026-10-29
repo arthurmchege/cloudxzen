@@ -39,7 +39,10 @@ def _service_response(service) -> ServiceResponse:
     "",
     response_model=ServiceResponse,
     status_code=status.HTTP_201_CREATED,
-    responses={422: {"model": ErrorResponse}},
+    responses={
+        422: {"model": ErrorResponse},
+        500: {"model": ErrorResponse, "description": "Database failure"},
+    },
 )
 def create_service_endpoint(
     payload: ServiceCreate,
@@ -57,7 +60,11 @@ def create_service_endpoint(
     return _service_response(service)
 
 
-@router.get("", response_model=list[ServiceResponse], responses={422: {"model": ErrorResponse}})
+@router.get(
+    "",
+    response_model=list[ServiceResponse],
+    responses={500: {"model": ErrorResponse, "description": "Database failure"}},
+)
 def list_services_endpoint(db: Session = Depends(get_db)) -> list[ServiceResponse]:
     return [_service_response(service) for service in list_services(db)]
 
@@ -69,6 +76,7 @@ def list_services_endpoint(db: Session = Depends(get_db)) -> list[ServiceRespons
     responses={
         404: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
+        500: {"model": ErrorResponse, "description": "Database failure"},
     },
 )
 def create_service_event_endpoint(
@@ -94,7 +102,10 @@ def create_service_event_endpoint(
 @router.get(
     "/{service_id}/events",
     response_model=list[ServiceEventResponse],
-    responses={404: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
+    responses={
+        404: {"model": ErrorResponse},
+        500: {"model": ErrorResponse, "description": "Database failure"},
+    },
 )
 def list_service_events_endpoint(
     service_id: UUID,
@@ -113,6 +124,7 @@ def list_service_events_endpoint(
         404: {"model": ErrorResponse},
         409: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
+        500: {"model": ErrorResponse, "description": "Database failure"},
     },
 )
 def resolve_service_event_endpoint(
