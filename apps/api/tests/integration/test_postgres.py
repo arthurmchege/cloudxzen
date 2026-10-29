@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.db.base import Base
 from app.domains.services.models import Service, ServiceEvent
+from app.domains.services.repository import create_service, list_services
+from app.domains.services.schemas import ServiceCreate
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -68,3 +70,16 @@ def test_foreign_key_rejects_missing_service(db_session: Session) -> None:
     with pytest.raises(IntegrityError):
         db_session.commit()
     db_session.rollback()
+
+
+def test_repository_creates_and_lists_services(db_session: Session) -> None:
+    created = create_service(
+        db_session,
+        ServiceCreate(name="Payments", environment="production"),
+    )
+    db_session.commit()
+
+    services = list_services(db_session)
+
+    assert services == [created]
+    assert services[0].name == "Payments"
