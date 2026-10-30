@@ -17,16 +17,15 @@ The repository was inspected before application changes:
 
 - repository root: `/home/arthur/Projects/CloudBench`;
 - branch: `main`;
-- `HEAD`: `88c1f5b` (`docs: reconcile Milestone 6 verification`);
+- `HEAD`: `978e834` (`docs: record Milestone 7 checkpoint`);
 - working tree: clean, with no untracked files;
 - remote: `origin` points to `arthurmchege/cloudxzen`;
 - local `main` and `origin/main`: synchronized with divergence `0 0`.
 
-Milestones 0–6 are documented as complete in the roadmap. The existing
-frontend is the Next.js 15 foundation in `apps/web`; it currently has no live
-API client or production service data. The backend is the modular-monolith
-FastAPI application in `apps/api`, backed by PostgreSQL, SQLAlchemy, and
-Alembic.
+Milestones 0–6 are documented as complete in the roadmap. Milestone 7 has
+since added the live frontend API client and service workflows described below.
+The backend is the modular-monolith FastAPI application in `apps/api`, backed
+by PostgreSQL, SQLAlchemy, and Alembic.
 
 ## Scope and Acceptance Criteria
 
@@ -140,14 +139,10 @@ Options:
      does not establish which contract is canonical.
    - Not justified without an explicit backward-compatibility requirement.
 
-Recommended decision: approve option 1 for Milestone 7, preserving the
-existing `/services` contract and recording `/api/v1` as a later compatibility
-decision. No dependent frontend integration code will be implemented until
-this decision is confirmed.
+The decision was approved for Milestone 7: preserve the existing `/services`
+contract and record `/api/v1` as a later compatibility decision.
 
-## Proposed Implementation Plan
-
-After the namespace decision is confirmed:
+## Implementation Plan
 
 1. Add a typed API client with configurable browser-safe base URL, structured
    error parsing, malformed-response guards, and network-failure handling.
@@ -159,6 +154,10 @@ After the namespace decision is confirmed:
 5. Add focused network-boundary and user-visible workflow tests.
 6. Run frontend and backend quality gates, update the roadmap/report, then
    create a reviewed Git checkpoint.
+
+The implementation stages above are complete for the current frontend scope.
+The remaining work is verification/documentation reconciliation and the
+separate retrieval-endpoint decision below.
 
 ## Testing Strategy
 
@@ -179,16 +178,54 @@ production build, the existing backend test suite, Ruff, Python compilation,
 lock validation, and Git diff checks. Tests will use safe network-boundary
 mocks or a dedicated test configuration and will not contact production data.
 
+## Service Retrieval Architecture Review
+
+The frontend currently calls `GET /services` and matches the requested UUID
+locally because the backend has no `GET /services/{service_id}` route.
+
+A dedicated retrieval operation fits the existing architecture:
+
+- `get_service(session, service_id)` already exists in the repository and
+  already returns `Service | None`;
+- the existing `ServiceResponse` schema and `_service_response()` helper can
+  be reused;
+- the route can raise the existing `HTTPException(404, "Service not found")`,
+  which is converted by the established exception handler to the structured
+  `not_found` envelope;
+- no database schema, migration, or repository refactor is required;
+- focused route tests can cover a successful UUID lookup and a nonexistent
+  UUID, while the existing list/status tests remain unchanged.
+
+Smallest implementation option: add `GET /services/{service_id}` after the
+decision is approved, using `get_service()` and `_service_response()`, plus
+OpenAPI response declarations and focused tests.
+
+Benefits:
+
+- avoids transferring every service for a detail page;
+- makes nonexistent-service behavior an authoritative backend result;
+- gives future clients a conventional resource-retrieval contract.
+
+Trade-offs:
+
+- expands the public API and OpenAPI surface;
+- requires a backend code/test/documentation checkpoint;
+- does not provide pagination or solve the deferred `/api/v1` namespace
+  decision.
+
+**Decision status: awaiting approval.** This endpoint has not been
+implemented in Milestone 7.
+
 ## Known Limitations and Risks
 
-- The `/api/v1` versus `/services` discrepancy is unresolved and blocks
-  dependent integration work until approved.
+- The `/api/v1` versus `/services` discrepancy remains deferred, but the
+  approved Milestone 7 integration uses `/services`.
 - The backend has no pagination, authentication, ownership, or uptime
   percentage calculation; the frontend must not present those as available.
 - The backend database routes require PostgreSQL, so browser development
   requires the API and a configured database.
-- Cross-origin development configuration may be needed once the client is
-  implemented; no production origin or secret will be hard-coded.
+- The frontend uses a same-origin Next.js proxy by default; no production
+  origin or secret is hard-coded.
 
 ## Implementation Progress
 
@@ -223,23 +260,24 @@ Frontend checks completed from `apps/web`:
 ```text
 npm run typecheck: passed
 npm run lint: passed
-npm test -- --run: passed; 3 test files, 11 tests
+npm test -- --run: passed; 4 test files, 19 tests
 npm run build: passed; Next.js 15.5.28 production build
 ```
 
 Backend regression checks completed from `apps/api`:
 
 ```text
-uv run --locked pytest: passed; 23 passed, 31 skipped
+TEST_DATABASE_URL=<isolated PostgreSQL test database> \
+  uv run --locked pytest: passed; 54 tests
 uv run --locked ruff check app tests: passed
 uv run --locked python -m compileall -q app tests: passed
 uv lock --check: passed
 ```
 
-The 31 skipped tests require the separately configured PostgreSQL
-`TEST_DATABASE_URL`; this run did not claim PostgreSQL integration coverage.
-The previously verified backend checkpoint remains documented in the
-Milestone 5 and Milestone 6 reports.
+The PostgreSQL run used a temporary `postgres:18` container bound only to
+`127.0.0.1:55432`, with no persistent volume and a dedicated database. The
+container was removed after verification. No production or existing database
+was used.
 
 ## Git Checkpoints
 
@@ -255,17 +293,17 @@ then pushed as a fast-forward. The current worktree is clean and local
 
 ## Current Status
 
-**In Progress — the initial live integration is implemented and verified
-locally, but the milestone is not yet complete.**
+**In Progress — implementation and required verification are complete, but
+the milestone remains open pending the service-retrieval endpoint decision and
+final handoff approval.**
 
-Remaining work includes broader user-visible tests for service details and
-event actions, a final review of API-client contracts, and full verification
-with the safe PostgreSQL test configuration where available. The integration
-checkpoint is already pushed; only the final milestone documentation
-reconciliation remains for this implementation stage.
+The frontend integration, expanded tests, full backend suite, quality checks,
+and documentation checkpoint are verified. No endpoint decision has been
+silently assumed or implemented.
 
 ## Next Action
 
-Continue with focused workflow tests and final quality verification without
-changing the approved `/services` namespace or inventing a dedicated service
-retrieval endpoint.
+Approve or defer the proposed `GET /services/{service_id}` endpoint. If
+deferred, the milestone can be closed with the current collection-lookup
+limitation explicitly accepted. If approved, implement it as a separate,
+focused backend change before marking Milestone 7 complete.

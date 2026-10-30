@@ -754,8 +754,9 @@ Current implementation uses the verified root `/services` contract. The
 specification's `/api/v1` namespace remains a deferred compatibility decision.
 The backend has no dedicated `GET /services/{service_id}` route, so the
 frontend currently locates a service from the collection before loading its
-event history. The milestone report records the implementation and verified
-test results:
+event history. A focused backend retrieval endpoint is recommended but not
+implemented and awaits approval. The milestone report records the
+implementation and verified test results:
 [`docs/MILESTONE_7_REPORT.md`](MILESTONE_7_REPORT.md).
 
 Git checkpoints:
