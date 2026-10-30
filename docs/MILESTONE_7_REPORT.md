@@ -285,11 +285,14 @@ was used.
 |---|---|---|
 | `6a5b451` | Start Milestone 7 report | Pushed to `origin/main` |
 | `23657d0` | Integrate service reliability workflows | Pushed to `origin/main` |
+| `978e834` | Record Milestone 7 checkpoint | Pushed to `origin/main` |
+| `f4dafe8` | Complete Milestone 7 verification | Pushed to `origin/main` |
 
 Before the implementation checkpoint, `git fetch origin main` confirmed local
 `main` and `origin/main` had divergence `0 0`. The implementation commit was
-then pushed as a fast-forward. The current worktree is clean and local
-`main` remains synchronized with `origin/main`.
+then pushed as a fast-forward. The current verified `HEAD` is `f4dafe8`;
+the worktree is clean and local `main` remains synchronized with
+`origin/main`.
 
 ## Current Status
 
